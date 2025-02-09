@@ -1,0 +1,26 @@
+CREATE TABLE books (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    isbn VARCHAR(20) UNIQUE NOT NULL,
+    published_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE borrowers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE borrow_records (
+    id SERIAL PRIMARY KEY,
+    book_id INT REFERENCES books(id) ON DELETE CASCADE,
+    borrower_id INT REFERENCES borrowers(id) ON DELETE CASCADE,
+    borrow_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    due_date TIMESTAMP NOT NULL,
+    return_date TIMESTAMP NULL,
+    status VARCHAR(20) CHECK (status IN ('BORROWED', 'RETURNED', 'LATE')) NOT NULL DEFAULT 'BORROWED'
+);
