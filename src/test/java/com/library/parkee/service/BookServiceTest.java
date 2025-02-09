@@ -2,6 +2,10 @@ package com.library.parkee.service;
 
 import com.library.parkee.model.Book;
 import com.library.parkee.repository.BookRepository;
+import com.library.parkee.service.BookService;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +43,7 @@ class BookServiceTest {
     void testSaveBook() {
         when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-        Book savedBook = bookService.saveBook(book);
+        Book savedBook = bookService.addBook(book);
 
         assertNotNull(savedBook);
         assertEquals("Test Book", savedBook.getTitle());
@@ -49,18 +54,18 @@ class BookServiceTest {
     void testGetBookById() {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
-        Optional<Book> retrievedBook = bookService.getBookById(1L);
+        Book retrievedBook = bookService.getBookById(1L);
 
-        assertTrue(retrievedBook.isPresent());
-        assertEquals("Test Book", retrievedBook.get().getTitle());
+        assertNotNull(retrievedBook);
+        assertEquals("Test Book", retrievedBook.getTitle());
     }
 
     @Test
     void testGetBookById_NotFound() {
         when(bookRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<Book> retrievedBook = bookService.getBookById(1L);
-
-        assertFalse(retrievedBook.isPresent());
+        assertThrows(EntityNotFoundException.class, () -> {
+            bookService.getBookById(1L);
+        });
     }
 }
